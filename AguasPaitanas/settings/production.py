@@ -55,3 +55,5 @@ MESSAGE_TAGS = {
     messages.INFO: 'info',
     messages.WARNING: 'warning',
 }
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
