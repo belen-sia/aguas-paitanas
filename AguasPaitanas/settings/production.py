@@ -2,6 +2,9 @@ from AguasPaitanas.settings.base import *
 import os
 import dj_database_url
 from decouple import config
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 🚫 Seguridad
 DEBUG = False
@@ -10,9 +13,12 @@ ALLOWED_HOSTS = ['aguas-paitanas.onrender.com', 'localhost', '127.0.0.1']
 # 📦 Archivos estáticos
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Whitenoise para servir archivos estáticos en producción
-MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware',
+                  'django.middleware.security.SecurityMiddleware'
+)
 
 # 📧 Configuración de correo (usa las mismas que local o variables de entorno)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
