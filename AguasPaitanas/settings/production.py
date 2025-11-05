@@ -4,7 +4,7 @@ import dj_database_url
 from decouple import config
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # 🚫 Seguridad
 DEBUG = False
@@ -16,9 +16,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Whitenoise para servir archivos estáticos en producción
-MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware',
-                  'django.middleware.security.SecurityMiddleware'
-)
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 # 📧 Configuración de correo (usa las mismas que local o variables de entorno)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
