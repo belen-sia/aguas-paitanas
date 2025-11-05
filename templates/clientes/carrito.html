@@ -1,0 +1,142 @@
+{% extends 'includes/base_portales.html' %}
+
+{% block title %}Carrito de Compras - Aguas Paitanás{% endblock %}
+{% block usuario_tipo %}Cliente{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-center fw-bold mb-2 text-primary">Carrito de Compras</h2>
+  <p class="text-center text-muted mb-4">
+    Los datos de envío se tomarán de tu perfil. Si necesitas cambiarlos, ve a
+    <a href="{% url 'clientes:editar_perfil' %}">Editar Datos de Registro</a>.
+  </p>
+
+
+  <!-- Formulario general -->
+  <form method="post" id="pedidoForm">
+    {% csrf_token %}
+
+    <!-- Selecciones de pago y facturación -->
+    <div class="card shadow-sm border-0 p-4 mb-4 bg-primary-subtle">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="metodo_pago_id" class="form-label fw-semibold">Método de Pago</label>
+          <select id="metodo_pago_id" name="metodo_pago_id" class="form-select form-select-sm" style="max-width:420px;" required>
+            <option value="">-- Selecciona un método --</option>
+            {% for m in metodos_pago %}
+              <option value="{{ m.id }}">{{ m.tipo_pago }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="tipo_factura" class="form-label fw-semibold">Tipo de Facturación</label>
+          <select id="tipo_factura" name="tipo_factura" class="form-select form-select-sm" style="max-width:420px;" required>
+            <option value="">-- Selecciona tipo --</option>
+            {% for key,label in tipos_factura %}
+              <option value="{{ key }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de productos -->
+    <div class="card shadow-sm border-0 p-4 mb-4">
+      <h4 class="mb-3 fw-bold text-secondary">Selecciona tus productos</h4>
+
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr class="table-primary">
+              <th>Producto</th>
+              <th>Precio Unitario</th>
+              <th>Cantidad</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="productos-lista">
+            {% for producto in productos %}
+            <tr>
+              <td>{{ producto.nombre }}</td>
+              <td>${{ producto.precio|floatformat:0 }}</td>
+              <td>
+                <input
+                  type="number"
+                  class="form-control cantidad-input"
+                  name="producto_{{ producto.id }}"
+                  min="0"
+                  value="0"
+                  data-precio="{{ producto.precio }}">
+              </td>
+              <td class="subtotal">$0</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center text-muted">No hay productos disponibles.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Total y botones -->
+    <div class="card shadow-sm border-0 p-4 text-center">
+      <h4 class="fw-bold text-secondary mb-3">Monto Total: <span id="total" class="text-success">$0</span></h4>
+      <div class="d-flex justify-content-center gap-2">
+        <a href="{% url 'clientes:portalclientes' %}" class="btn btn-outline-secondary px-4 py-2">Volver</a>
+        <button type="submit" class="btn btn-success px-4 py-2 fw-bold">Registrar Pedido</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Script para cálculo del total -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const cantidadInputs = document.querySelectorAll('.cantidad-input');
+  const totalElement = document.getElementById('total');
+
+  cantidadInputs.forEach(input => {
+    input.addEventListener('input', () => {
+      const row = input.closest('tr');
+      const precio = parseFloat(input.dataset.precio);
+      const cantidad = parseInt(input.value) || 0;
+      const subtotal = precio * cantidad;
+
+      // Actualiza subtotal de la fila
+      row.querySelector('.subtotal').textContent = '$' + subtotal.toLocaleString('es-CL');
+
+      // Recalcula total
+      let total = 0;
+      document.querySelectorAll('.subtotal').forEach(sub => {
+        total += parseFloat(sub.textContent.replace(/\D/g, '')) || 0;
+      });
+
+      totalElement.textContent = '$' + total.toLocaleString('es-CL');
+    });
+  });
+
+  // Oculta automáticamente el mensaje después de 4 segundos
+  setTimeout(() => {
+    const alert = document.querySelector('.alert');
+    if (alert) {
+      const bsAlert = new bootstrap.Alert(alert);
+      bsAlert.close();
+    }
+  }, 4000);
+});
+</script>
+
+<style>
+  .card {
+    border-radius: 1rem;
+  }
+  h2, h4 {
+    color: #0077b6;
+  }
+  table th, table td {
+    vertical-align: middle;
+  }
+</style>
+{% endblock %}

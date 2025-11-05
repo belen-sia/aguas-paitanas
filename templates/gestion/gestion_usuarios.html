@@ -1,0 +1,304 @@
+{% extends 'includes/base_portales.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Botón Volver -->
+    <div class="mb-3">
+        <a href="{% url 'trabajadores:portaladministrador' %}" class="btn btn-secondary">
+            ← Volver al portal administrador
+        </a>
+    </div>
+
+    <h2 class="text-center mb-4">Gestión de Usuarios</h2>
+
+    <!-- Buscador + botón agregar -->
+    <div class="mb-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <form method="GET" class="d-flex flex-grow-1 gap-2">
+            <input type="text" name="q" class="form-control" placeholder="Buscar usuario..." value="{{ request.GET.q }}">
+            <button type="submit" class="btn btn-outline-primary">Buscar</button>
+        </form>
+
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAgregarUsuario">
+            Agregar Usuario
+        </button>
+    </div>
+
+    <!-- Tabla usuarios -->
+    <div class="table-responsive shadow rounded-3">
+        <table class="table table-hover align-middle text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Rol</th>
+                    <th>Activo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in usuarios %}
+                <tr data-id="{{ u.id }}">
+                    <td>{{ u.id }}</td>
+                    <td>{{ u.first_name }}</td>
+                    <td>{{ u.last_name }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.get_rol_display }}</td>
+                    <td>
+                        {% if u.is_active %}
+                            <span class="badge bg-success">Activo</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <!-- Editar -->
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario"
+                            data-id="{{ u.id }}"
+                            data-first_name="{{ u.first_name }}"
+                            data-last_name="{{ u.last_name }}"
+                            data-email="{{ u.email }}"
+                            data-username="{{ u.username }}"
+                            data-rol="{{ u.rol }}"
+                            data-is_active="{{ u.is_active }}">
+                            Editar
+                        </button>
+
+                        <!-- Eliminar -->
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminarUsuario"
+                            data-id="{{ u.id }}" data-nombre="{{ u.first_name }} {{ u.last_name }}">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-muted text-center">No hay usuarios registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Agregar Usuario -->
+<div class="modal fade" id="modalAgregarUsuario" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{% url 'usuarios:registrar_usuario' %}">
+        {% csrf_token %}
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Agregar Usuario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">Nombre</label>
+              <input type="text" name="first_name" class="form-control" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$" title="Solo letras y espacios" inputmode="text">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apellido</label>
+              <input type="text" name="last_name" class="form-control" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$" title="Solo letras y espacios" inputmode="text">
+            </div>
+          </div>
+          <div class="row g-2 mt-2">
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Username</label>
+              <input type="text" name="username" class="form-control" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" title="Solo letras" inputmode="text">
+            </div>
+          </div>
+          <div class="row g-2 mt-2">
+            <div class="col-md-6">
+              <label class="form-label">Rol</label>
+              <select name="rol" class="form-select" required>
+                <option value="ADMIN">Administrador</option>
+                <option value="TRAB">Trabajador</option>
+                <option value="REPAR">Repartidor</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Activo</label>
+              <select name="is_active" class="form-select">
+                <option value="1">Sí</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="row g-2 mt-2">
+            <div class="col-md-6">
+              <label class="form-label">Contraseña</label>
+              <input type="password" id="contrasena1" name="contrasena1" class="form-control" minlength="4" maxlength="6" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Repetir contraseña</label>
+              <input type="password" id="contrasena2" name="contrasena2" class="form-control" minlength="4" maxlength="6" required>
+            </div>
+          </div>
+          <div id="passwordAlert" class="alert alert-danger d-none mt-2" role="alert">Las contraseñas no coinciden.</div>
+          <script>
+          (function() {
+            const modal = document.getElementById('modalAgregarUsuario');
+            if (!modal) return;
+            const form = modal.querySelector('form');
+            if (!form) return;
+            const p1 = form.querySelector('input[name="contrasena1"]');
+            const p2 = form.querySelector('input[name="contrasena2"]');
+            const alertBox = form.querySelector('#passwordAlert');
+            function check() {
+              if (p1.value && p2.value && p1.value !== p2.value) {
+                alertBox.classList.remove('d-none');
+                return false;
+              } else {
+                alertBox.classList.add('d-none');
+                return true;
+              }
+            }
+            p1.addEventListener('input', check);
+            p2.addEventListener('input', check);
+            form.addEventListener('submit', function(e) {
+              if (!check()) {
+                e.preventDefault();
+                p2.focus();
+              }
+            });
+            const nameInputs = form.querySelectorAll('input[name="first_name"], input[name="last_name"]');
+            nameInputs.forEach(inp => {
+              inp.addEventListener('input', () => {
+                inp.value = inp.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ ]+/g, '');
+              });
+            });
+            const username = form.querySelector('input[name="username"]');
+            if (username) {
+              username.addEventListener('input', () => {
+                username.value = username.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ]+/g, '');
+              });
+            }
+          })();
+          </script>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Guardar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Usuario -->
+<div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" id="formEditarUsuario">
+        {% csrf_token %}
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Editar Usuario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id" id="editarUsuarioId">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">Nombre</label>
+              <input type="text" name="first_name" id="editarFirstName" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apellido</label>
+              <input type="text" name="last_name" id="editarLastName" class="form-control" required>
+            </div>
+          </div>
+          <div class="row g-2 mt-2">
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" id="editarEmail" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Username</label>
+              <input type="text" name="username" id="editarUsername" class="form-control" required>
+            </div>
+          </div>
+          <div class="row g-2 mt-2">
+            <div class="col-md-6">
+              <label class="form-label">Rol</label>
+              <select name="rol" id="editarRol" class="form-select" required>
+                <option value="ADMIN">Administrador</option>
+                <option value="TRAB">Trabajador</option>
+                <option value="REPAR">Repartidor</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Activo</label>
+              <select name="is_active" id="editarActivo" class="form-select">
+                <option value="1">Sí</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Eliminar Usuario -->
+<div class="modal fade" id="modalEliminarUsuario" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{% url 'usuarios:eliminar_usuario' 0 %}" id="formEliminarUsuario">
+        {% csrf_token %}
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">Eliminar Usuario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Deseas eliminar al usuario <strong id="nombreEliminarUsuario"></strong>?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const modalEditar = document.getElementById('modalEditarUsuario');
+modalEditar.addEventListener('show.bs.modal', event => {
+  const button = event.relatedTarget;
+  const id = button.getAttribute('data-id');
+  document.getElementById('editarUsuarioId').value = id;
+  document.getElementById('editarFirstName').value = button.getAttribute('data-first_name');
+  document.getElementById('editarLastName').value = button.getAttribute('data-last_name');
+  document.getElementById('editarEmail').value = button.getAttribute('data-email');
+  document.getElementById('editarUsername').value = button.getAttribute('data-username');
+  document.getElementById('editarRol').value = button.getAttribute('data-rol');
+  const isActive = button.getAttribute('data-is_active') === 'True' ? '1' : '0';
+  document.getElementById('editarActivo').value = isActive;
+  document.getElementById('formEditarUsuario').action = "{% url 'usuarios:editar_usuario' 0 %}".replace('0', id);
+});
+
+const modalEliminar = document.getElementById('modalEliminarUsuario');
+modalEliminar.addEventListener('show.bs.modal', event => {
+  const button = event.relatedTarget;
+  const id = button.getAttribute('data-id');
+  document.getElementById('nombreEliminarUsuario').textContent = button.getAttribute('data-nombre');
+  document.getElementById('formEliminarUsuario').action = "{% url 'usuarios:eliminar_usuario' 0 %}".replace('0', id);
+});
+</script>
+{% endblock %}

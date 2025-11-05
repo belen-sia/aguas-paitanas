@@ -1,0 +1,52 @@
+{% extends 'includes/base_portales.html' %}
+{% block title %}Historial de Entregas - Repartidor{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2 class="mb-4">Historial de Entregas</h2>
+
+  {% if pedidos %}
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead class="table-secondary">
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Dirección</th>
+          <th>Teléfono</th>
+          <th>Fecha pedido</th>
+          <th>Fecha entrega</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pedidos %}
+        <tr>
+          <td>#{{ p.id }}</td>
+          <td>
+            {% if p.cliente %}
+              {{ p.cliente.nombre }} {{ p.cliente.apellido }}
+            {% else %}
+              {{ p.nombre_cliente_temp }} {{ p.apellido_cliente_temp }}
+            {% endif %}
+          </td>
+          <td>{% if p.cliente %}{{ p.cliente.direccion }}{% else %}{{ p.direccion_temp }}{% endif %}</td>
+          <td>{% if p.cliente %}{{ p.cliente.telefono }}{% else %}{{ p.telefono_temp }}{% endif %}</td>
+          <td>{{ p.fecha_pedido|date:"d/m/Y" }}</td>
+          <td>{% if p.fecha_entrega %}{{ p.fecha_entrega|date:"d/m/Y" }}{% else %}-{% endif %}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-success">{{ p.get_estado_display }}</span>
+              <a href="{% url 'pedidos:detalle_pedido' p.id %}" class="btn btn-sm btn-info">Ver</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="alert alert-info">Aún no tienes entregas registradas.</div>
+  {% endif %}
+</div>
+{% endblock %}

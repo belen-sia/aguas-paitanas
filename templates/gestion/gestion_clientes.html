@@ -1,0 +1,317 @@
+{% extends 'includes/base_portales.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Botón Volver -->
+    <div class="mb-3">
+        <a href="{% url 'trabajadores:portaladministrador' %}" class="btn btn-secondary">
+            ← Volver al portal administrador
+        </a>
+    </div>
+
+    <h2 class="text-center mb-4">Gestión de Clientes</h2>
+
+    <!-- Buscador + botón agregar -->
+    <div class="mb-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <form method="GET" class="d-flex flex-grow-1 gap-2">
+            <input type="text" name="q" class="form-control" placeholder="Buscar cliente..." value="{{ request.GET.q }}">
+            <button type="submit" class="btn btn-outline-primary">Buscar</button>
+        </form>
+
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAgregarCliente">
+            Agregar Cliente
+        </button>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-responsive shadow rounded-3">
+        <table class="table table-hover align-middle text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre Completo</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th>Fecha Registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr data-id="{{ cliente.id }}">
+                    <td>{{ cliente.id }}</td>
+                    <td>{{ cliente.nombre }} {{ cliente.apellido }}</td>
+                    <td>{{ cliente.correo }}</td>
+                    <td>{{ cliente.telefono }}</td>
+                    <td>{{ cliente.direccion }}</td>
+                    <td>{{ cliente.get_tipo_cliente_display }}</td>
+                    <td>
+                        {% if cliente.activo %}
+                            <span class="badge bg-success">Activo</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ cliente.fecha_registro|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <!-- Editar -->
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
+                            data-id="{{ cliente.id }}"
+                            data-nombre="{{ cliente.nombre }}"
+                            data-apellido="{{ cliente.apellido }}"
+                            data-correo="{{ cliente.correo }}"
+                            data-telefono="{{ cliente.telefono }}"
+                            data-direccion="{{ cliente.direccion }}"
+                            data-tipo="{{ cliente.tipo_cliente }}">
+                            Editar
+                        </button>
+
+                        <!-- Eliminar -->
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminarCliente"
+                            data-id="{{ cliente.id }}" data-nombre="{{ cliente.nombre }} {{ cliente.apellido }}">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-muted text-center">No hay clientes registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Agregar -->
+<div class="modal fade" id="modalAgregarCliente" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{% url 'clientes:registrar_cliente' %}">
+        {% csrf_token %}
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Agregar Cliente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">Nombre</label>
+              <input type="text" name="nombre" class="form-control" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñÜü ]+$" title="Solo letras y espacios" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apellido</label>
+              <input type="text" name="apellido" class="form-control" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñÜü ]+$" title="Solo letras y espacios" required>
+            </div>
+          </div>
+          <div class="mb-3 mt-2">
+            <label class="form-label">Correo</label>
+            <input type="email" name="correo" class="form-control" required>
+          </div>
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">Teléfono</label>
+              <input type="text" name="telefono" class="form-control" value="+569" pattern="^\+569\d{8}$" placeholder="+569XXXXXXXX" title="Debe empezar con +569 y seguir con 8 dígitos" inputmode="numeric" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Tipo de Cliente</label>
+              <select name="tipo_cliente" class="form-select" required>
+                <option value="D">Domiciliario</option>
+                <option value="E">Empresa</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3 mt-2">
+            <label class="form-label">Dirección</label>
+            <input type="text" name="direccion" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input type="password" name="contrasena" class="form-control" minlength="4" maxlength="6" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Guardar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar -->
+<div class="modal fade" id="modalEditarCliente" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" id="formEditarCliente">
+        {% csrf_token %}
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Editar Cliente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id" id="editarClienteId">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">Nombre</label>
+              <input type="text" name="nombre" id="editarNombreCliente" class="form-control" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñÜü ]+$" title="Solo letras y espacios" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apellido</label>
+              <input type="text" name="apellido" id="editarApellidoCliente" class="form-control" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñÜü ]+$" title="Solo letras y espacios" required>
+            </div>
+          </div>
+          <div class="mb-3 mt-2">
+            <label class="form-label">Correo</label>
+            <input type="email" name="correo" id="editarCorreoCliente" class="form-control" required>
+          </div>
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">Teléfono</label>
+              <input type="text" name="telefono" id="editarTelefonoCliente" class="form-control" pattern="^\+569\d{8}$" inputmode="numeric" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Tipo</label>
+              <input type="text" id="editarTipoClienteTexto" class="form-control" value="" readonly>
+              <input type="hidden" name="tipo_cliente" id="editarTipoClienteHidden" value="">
+            </div>
+          </div>
+          <div class="mb-3 mt-2">
+            <label class="form-label">Dirección</label>
+            <input type="text" name="direccion" id="editarDireccionCliente" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Eliminar -->
+<div class="modal fade" id="modalEliminarCliente" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{% url 'clientes:eliminar_cliente' 0 %}" id="formEliminarCliente">
+        {% csrf_token %}
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">Eliminar Cliente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Deseas eliminar al cliente <strong id="nombreEliminarCliente"></strong>?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const modalEditar = document.getElementById('modalEditarCliente');
+modalEditar.addEventListener('show.bs.modal', event => {
+  const button = event.relatedTarget;
+  document.getElementById('editarClienteId').value = button.getAttribute('data-id');
+  document.getElementById('editarNombreCliente').value = button.getAttribute('data-nombre');
+  document.getElementById('editarApellidoCliente').value = button.getAttribute('data-apellido');
+  document.getElementById('editarCorreoCliente').value = button.getAttribute('data-correo');
+  document.getElementById('editarTelefonoCliente').value = button.getAttribute('data-telefono');
+  document.getElementById('editarDireccionCliente').value = button.getAttribute('data-direccion');
+  const tipoCode = button.getAttribute('data-tipo');
+  const tipoTexto = (tipoCode === 'E') ? 'Empresa' : 'Domiciliario';
+  const tipoHidden = document.getElementById('editarTipoClienteHidden');
+  const tipoTextoInput = document.getElementById('editarTipoClienteTexto');
+  if (tipoHidden) tipoHidden.value = tipoCode;
+  if (tipoTextoInput) tipoTextoInput.value = tipoTexto;
+  document.getElementById('formEditarCliente').action = "{% url 'clientes:editar_cliente' 0 %}".replace('0', button.getAttribute('data-id'));
+});
+
+const modalEliminar = document.getElementById('modalEliminarCliente');
+modalEliminar.addEventListener('show.bs.modal', event => {
+  const button = event.relatedTarget;
+  const clienteId = button.getAttribute('data-id');
+  document.getElementById('nombreEliminarCliente').textContent = button.getAttribute('data-nombre');
+  document.getElementById('formEliminarCliente').action = "{% url 'clientes:eliminar_cliente' 0 %}".replace('0', clienteId);
+});
+</script>
+<script>
+// ===== Validación/sanitización en cliente (Gestión Clientes) =====
+// 1) Nombre/Apellido: solo letras (con acentos) y espacios
+const LETTERS_SPACES = /[^A-Za-zÁÉÍÓÚáéíóúÑñÜü ]+/g;
+function sanitizeLettersSpaces(input) {
+  const before = input.value;
+  input.value = before.replace(LETTERS_SPACES, '');
+}
+function blockDigitsAndSymbols(evt) {
+  const k = evt.key;
+  if (/^[0-9]$/.test(k)) { evt.preventDefault(); }
+}
+
+// Hook Add modal
+const addNombre = document.querySelector('#modalAgregarCliente input[name="nombre"]');
+const addApellido = document.querySelector('#modalAgregarCliente input[name="apellido"]');
+if (addNombre) {
+  addNombre.addEventListener('input', () => sanitizeLettersSpaces(addNombre));
+  addNombre.addEventListener('keydown', blockDigitsAndSymbols);
+}
+if (addApellido) {
+  addApellido.addEventListener('input', () => sanitizeLettersSpaces(addApellido));
+  addApellido.addEventListener('keydown', blockDigitsAndSymbols);
+}
+
+// Hook Edit modal
+const editNombre = document.getElementById('editarNombreCliente');
+const editApellido = document.getElementById('editarApellidoCliente');
+if (editNombre) {
+  editNombre.addEventListener('input', () => sanitizeLettersSpaces(editNombre));
+  editNombre.addEventListener('keydown', blockDigitsAndSymbols);
+}
+if (editApellido) {
+  editApellido.addEventListener('input', () => sanitizeLettersSpaces(editApellido));
+  editApellido.addEventListener('keydown', blockDigitsAndSymbols);
+}
+
+// 2) Teléfono: forzar prefijo +569 y 8 dígitos, sin letras
+function enforcePhoneCl(input) {
+  const prefix = '+569';
+  if (!input.value.startsWith(prefix)) {
+    // Normaliza y recoloca prefijo
+    const digits = input.value.replace(/\D/g, '');
+    input.value = prefix + digits.replace(/^569/, '');
+  }
+  // Quitar cualquier no-dígito después del prefijo y limitar a 8 dígitos
+  const rest = input.value.slice(prefix.length).replace(/\D/g, '').slice(0, 8);
+  input.value = prefix + rest;
+}
+function blockLettersInPhone(evt) {
+  if (/[A-Za-zÁÉÍÓÚáéíóúÑñÜü]/.test(evt.key)) evt.preventDefault();
+}
+
+// Add modal phone
+const addPhone = document.querySelector('#modalAgregarCliente input[name="telefono"]');
+if (addPhone) {
+  addPhone.addEventListener('input', () => enforcePhoneCl(addPhone));
+  addPhone.addEventListener('keydown', blockLettersInPhone);
+  enforcePhoneCl(addPhone);
+}
+// Edit modal phone
+const editPhone = document.getElementById('editarTelefonoCliente');
+if (editPhone) {
+  editPhone.addEventListener('input', () => enforcePhoneCl(editPhone));
+  editPhone.addEventListener('keydown', blockLettersInPhone);
+}
+</script>
+{% endblock %}
+
+

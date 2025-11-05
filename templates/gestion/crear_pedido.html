@@ -1,0 +1,285 @@
+{% extends 'includes/base_portales.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4 px-3">
+
+    <!-- ENCABEZADO -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <a href="{% url 'pedidos:gestion_pedidos' %}" class="btn btn-secondary mb-2">
+            ← Volver a gestión de pedidos
+        </a>
+        <h2 class="text-center flex-grow-1 fw-bold text-primary mb-2">
+            🧾 Crear Nuevo Pedido
+        </h2>
+        <div style="width: 120px;"></div>
+    </div>
+
+    <!-- MENSAJES DE ALERTA -->
+    {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+                <div class="alert
+                    {% if message.tags == 'error' %}alert-danger
+                    {% elif message.tags == 'success' %}alert-success
+                    {% elif message.tags == 'warning' %}alert-warning
+                    {% else %}alert-info{% endif %}
+                    alert-dismissible fade show shadow-sm"
+                    role="alert">
+                    <i class="bi bi-info-circle-fill me-2"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- FORMULARIO -->
+    <div class="shadow-lg bg-white rounded-4 p-4 w-100">
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <!-- CLIENTE EXISTENTE O PEDIDO RÁPIDO -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label for="cliente_id" class="form-label fw-semibold">Cliente existente</label>
+                    <select id="cliente_id" name="cliente_id" class="form-select">
+                        <option value="">-- Selecciona un cliente --</option>
+                        {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}">
+                                {{ cliente.nombre }} {{ cliente.apellido }} — {{ cliente.direccion }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">Si seleccionas un cliente, se ocultarán los campos de pedido rápido.</small>
+                </div>
+
+                <!-- SECCIÓN DE PEDIDO RÁPIDO -->
+                <div class="col-md-6" id="pedidoRapidoContainer">
+                    <label class="form-label fw-semibold">O crear pedido rápido</label>
+                    <input type="text" name="nombre" class="form-control mb-1 rapido-input" placeholder="Nombre" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$" title="Solo letras">
+                    <input type="text" name="apellido" class="form-control mb-1 rapido-input" placeholder="Apellido" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$" title="Solo letras">
+                    <input type="text" name="direccion" class="form-control mb-1 rapido-input" placeholder="Dirección">
+                    <input type="text" name="telefono" class="form-control rapido-input" placeholder="Teléfono" value="+569" pattern="^\+569\d{8}$" inputmode="numeric" maxlength="12" title="Debe empezar con +569 y seguir con 8 dígitos">
+                    <small class="text-muted">Estos campos se usarán solo si no seleccionas un cliente existente.</small>
+                </div>
+            </div>
+
+            <!-- TIPO DE CLIENTE Y FACTURA -->
+            <div class="row g-3 mb-4">
+                <!-- Campo tipo_cliente: visible solo si es cliente temporal -->
+                <div class="col-md-6" id="tipoClienteContainer" style="display: none;">
+                    <label for="tipo_cliente" class="form-label fw-semibold">Tipo de Cliente</label>
+                    <select id="tipo_cliente" name="tipo_cliente" class="form-select">
+                        <option value="">-- Selecciona tipo de cliente --</option>
+                        {% for key, value in tipos_cliente.items %}
+                            <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="tipo_factura" class="form-label fw-semibold">Tipo de Factura</label>
+                    <select id="tipo_factura" name="tipo_factura" class="form-select" required>
+                        <option value="">-- Selecciona tipo de factura --</option>
+                        {% for key, value in tipos_factura.items %}
+                            <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- FECHA DE CREACIÓN -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Fecha de creación</label>
+                    <input type="text" class="form-control bg-light" value="{% now 'd/m/Y' %}" disabled>
+                </div>
+            </div>
+
+            <!-- PRODUCTOS -->
+            <h5 class="fw-bold text-primary mb-3">Seleccionar Productos</h5>
+            <div class="table-responsive mb-4">
+                <table class="table table-hover align-middle table-bordered">
+                    <thead class="table-light text-center">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Tipo</th>
+                            <th>Precio (CLP)</th>
+                            <th>Stock</th>
+                            <th style="width: 120px;">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for producto in productos %}
+                        <tr>
+                            <td>{{ producto.nombre }}</td>
+                            <td>{{ producto.tipo.nombre }}</td>
+                            <td>${{ producto.precio|floatformat:0 }}</td>
+                            <td>{{ producto.stock }}</td>
+                            <td class="text-center">
+                                <input type="number"
+                                       name="cantidad_{{ producto.id }}"
+                                       class="form-control text-center cantidad-input"
+                                       min="0"
+                                       max="{{ producto.stock }}"
+                                       value="0"
+                                       data-precio="{{ producto.precio }}">
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-3 text-muted">
+                                No hay productos disponibles en este momento.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- MÉTODO DE PAGO -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label for="metodo_pago" class="form-label fw-semibold">Método de Pago</label>
+                    <select id="metodo_pago" name="metodo_pago" class="form-select" required>
+                        <option value="">-- Selecciona un método de pago --</option>
+                        {% for metodo in metodos_pago %}
+                            <option value="{{ metodo.id }}">{{ metodo.tipo_pago }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- TOTAL Y BOTÓN -->
+            <div class="row align-items-center">
+                <div class="col-md-6 text-md-start text-center mb-3 mb-md-0">
+                    <h5 class="fw-semibold">Total estimado:
+                        <span id="totalPedido" class="text-success">$0</span>
+                    </h5>
+                </div>
+                <div class="col-md-6 text-md-end text-center">
+                    <button type="submit" class="btn btn-success px-5 py-2 fw-semibold rounded-3 shadow-sm">
+                        <i class="bi bi-check-circle me-2"></i> Crear Pedido
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- SCRIPT PARA TOTAL Y MOSTRAR/OCULTAR SECCIONES -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const cantidadInputs = document.querySelectorAll('.cantidad-input');
+    const totalSpan = document.getElementById('totalPedido');
+    const clienteSelect = document.getElementById('cliente_id');
+    const pedidoRapidoContainer = document.getElementById('pedidoRapidoContainer');
+    const tipoClienteContainer = document.getElementById('tipoClienteContainer');
+    const tipoClienteSelect = document.getElementById('tipo_cliente');
+    const rapidoInputs = document.querySelectorAll('.rapido-input');
+
+    // Calcular total
+    cantidadInputs.forEach(input => {
+        input.addEventListener('input', () => {
+            // Sanitizar a dígitos únicamente
+            input.value = input.value.replace(/[^0-9]/g, '');
+            calcularTotal();
+        });
+        input.addEventListener('keydown', (e) => {
+            // Permitir sólo dígitos, navegación y borrado
+            const allowedKeys = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'];
+            if (allowedKeys.includes(e.key)) return;
+            if (!/^[0-9]$/.test(e.key)) e.preventDefault();
+        });
+    });
+    function calcularTotal() {
+        let total = 0;
+        cantidadInputs.forEach(input => {
+            const cantidad = parseInt(input.value) || 0;
+            const precio = parseFloat(input.dataset.precio);
+            total += cantidad * precio;
+        });
+        totalSpan.textContent = '$' + total.toLocaleString('es-CL');
+    }
+
+    // Mostrar/ocultar campos según cliente seleccionado
+    function toggleCamposCliente() {
+        const clienteSeleccionado = clienteSelect.value !== '';
+
+        if (clienteSeleccionado) {
+            // Ocultar pedido rápido y tipo cliente
+            pedidoRapidoContainer.style.display = 'none';
+            tipoClienteContainer.style.display = 'none';
+            tipoClienteSelect.removeAttribute('required');
+            tipoClienteSelect.value = '';
+            rapidoInputs.forEach(input => input.disabled = true);
+        } else {
+            // Mostrar ambos
+            pedidoRapidoContainer.style.display = 'block';
+            tipoClienteContainer.style.display = 'block';
+            tipoClienteSelect.setAttribute('required', 'required');
+            rapidoInputs.forEach(input => input.disabled = false);
+        }
+    }
+
+    // Ejecutar al cargar y cuando cambia el cliente
+    clienteSelect.addEventListener('change', toggleCamposCliente);
+    toggleCamposCliente(); // inicial
+
+    // Bloquear borrado del prefijo +569 en teléfono rápido
+    const telRapido = document.querySelector('#pedidoRapidoContainer input[name="telefono"]');
+    function enforcePrefix(input) {
+        const prefix = '+569';
+        if (!input.value.startsWith(prefix)) {
+            const digits = input.value.replace(/[^0-9]/g, '');
+            input.value = prefix + digits.replace(/^569/, '');
+            if (!input.value.startsWith(prefix)) input.value = prefix;
+        }
+        if (input.value.length > 12) input.value = input.value.slice(0, 12);
+    }
+    function blockPrefixDeletion(e) {
+        const input = e.target;
+        const caret = input.selectionStart;
+        if ((e.key === 'Backspace' && caret <= 4) || (e.key === 'Delete' && caret < 4)) {
+            e.preventDefault();
+            input.setSelectionRange(4, 4);
+        }
+    }
+    if (telRapido) {
+        enforcePrefix(telRapido);
+        telRapido.addEventListener('input', () => enforcePrefix(telRapido));
+        telRapido.addEventListener('keydown', (e) => {
+            // Bloquear borrado del prefijo
+            blockPrefixDeletion(e);
+            const allowedNav = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
+            if (allowedNav.includes(e.key)) return;
+            // Permitir solo dígitos después del prefijo
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+        telRapido.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text');
+            const digits = text.replace(/[^0-9]/g, '').slice(0, 8);
+            telRapido.value = '+569' + digits;
+            enforcePrefix(telRapido);
+        });
+    }
+
+    // Restringir nombre/apellido a letras (con acentos)
+    const nombreRapido = document.querySelector('#pedidoRapidoContainer input[name="nombre"]');
+    const apellidoRapido = document.querySelector('#pedidoRapidoContainer input[name="apellido"]');
+    function onlyLettersKeydown(e) {
+        const allowedKeys = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'];
+        if (allowedKeys.includes(e.key)) return;
+        // Letras con acentos y Ñ/ñ/Ü/ü
+        if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]$/.test(e.key)) e.preventDefault();
+    }
+    if (nombreRapido) nombreRapido.addEventListener('keydown', onlyLettersKeydown);
+    if (apellidoRapido) apellidoRapido.addEventListener('keydown', onlyLettersKeydown);
+});
+</script>
+{% endblock %}
+
+

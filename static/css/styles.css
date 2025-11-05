@@ -1,0 +1,355 @@
+/* ==== INICIO ==== */
+/* --- Estilos generales --- */
+body {
+  font-family: Arial, sans-serif;
+}
+
+/* --- Botón azul principal --- */
+.btn-pedido {
+  background-color: #1a44f7;
+  color: white;
+  font-weight: bold;
+  border-radius: 12px;
+  padding: 10px 30px;
+  transition: background-color 0.3s ease;
+}
+.btn-pedido:hover {
+  background-color: #1639cc;
+  color: white;
+}
+
+/* --- Botón borde negro (iniciar sesión) --- */
+.btn-login {
+  border: 2px solid #000;
+  color: #000;
+  font-weight: bold;
+  border-radius: 12px;
+  padding: 10px 30px;
+  background: white;
+  transition: all 0.3s ease;
+}
+.btn-login:hover {
+  background-color: #1a44f7;
+  color: white;
+}
+
+/* --- Texto destacado azul --- */
+.highlight-text {
+  color: #1a44f7;
+  font-weight: bold;
+}
+
+/* --- Caja de imagen del hero --- */
+.image-box {
+  border-radius: 20px;
+  padding: 20px;
+}
+/* --- Imagen del hero (reparto gratis) --- */
+.hero-img {
+  width: 100%;
+  height: auto; /* Mantiene proporción original */
+  max-width: 500px; /* Tamaño máximo en pantallas grandes */
+  border-radius: 20px;
+  object-fit: contain; /* Evita recortes y deformaciones */
+}
+
+/* En pantallas pequeñas, centra y ajusta */
+@media (max-width: 768px) {
+  .hero-img {
+    max-width: 90%;
+    margin: 0 auto;
+    display: block;
+  }
+}
+
+
+/* --- Productos --- */
+.producto-box {
+  background-color: #e6ebff; /* Fondo azul claro */
+  border-radius: 20px;
+  padding: 20px;
+  transition: transform 0.2s ease;
+}
+.producto-box:hover {
+  transform: scale(1.03);
+}
+.producto-img {
+  border-radius: 15px;
+  width: 100%;
+  max-width: 250px;
+}
+
+
+
+.producto-box {
+  background-color: #e8efff;       /* Azul claro suave */
+  border-radius: 20px;             /* Bordes redondeados */
+  padding: 20px;                   /* Espacio interno */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease-in-out;
+  max-width: 250px;
+}
+
+.producto-box:hover {
+  transform: scale(1.05);
+}
+
+.producto-img {
+  max-height: 200px;
+  width: auto;
+}
+
+.producto-box {
+  background-color: #e8efff;       /* Azul claro */
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease-in-out;
+  max-width: 250px;
+}
+
+.producto-box:hover {
+  transform: scale(1.05);
+}
+
+.producto-img {
+  max-height: 200px;
+  width: auto;
+}
+
+.highlight-text {
+  color: #1a44f7;
+  font-weight: bold;
+}
+
+/* ==== INICIAR SESION O REGISTRARSE ==== */
+body {
+    background: linear-gradient(to bottom, #e0f7ff, #ffffff);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 🔹 Cuadro de login/registro */
+.rounded-card {
+    max-width: 700px;
+    width: 100%;
+    margin: 2rem auto;
+    padding: 3rem;
+}
+
+@media (max-width: 768px) {
+    .rounded-card {
+        max-width: 90%;
+        padding: 2rem;
+    }
+}
+
+/* 🔹 Logo */
+.logo {
+    width: 170px;  /* Más grande */
+    height: auto;
+    display: block;
+    margin: 0 auto 2rem auto;
+}
+
+/* 🔹 Inputs redondeados */
+.input-rounded {
+    border-radius: 15px;
+    padding: 14px 16px;  /* Más espacio dentro del input */
+    border: 1px solid #cce0ff;
+    font-size: 1.1rem;
+}
+
+/* 🔹 Botón azul corporativo */
+.btn-custom {
+    background-color: #1a44f7;
+    color: white;
+    border-radius: 25px;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+.btn-custom:hover {
+    background-color: #0d2bb8;
+}
+
+/* 🔹 Botón “Volver al inicio” */
+.btn-custom-outline {
+    background-color: white;
+    color: #1a44f7;
+    border: 2px solid #1a44f7;
+    border-radius: 25px;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+}
+
+.btn-custom-outline:hover {
+    background-color: #1a44f7;
+    color: white;
+}
+
+/* 🔹 Títulos más grandes y negro */
+h3.text-center {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #000;
+}
+
+/* 🔹 Ajustes para móviles */
+@media (max-width: 768px) {
+    .rounded-card {
+        max-width: 90%;
+        padding: 2.5rem !important;
+    }
+    .logo {
+        width: 120px;
+    }
+    h3.text-center {
+        font-size: 1.7rem;
+    }
+    .input-rounded {
+        font-size: 1rem;
+        padding: 12px;
+    }
+}
+
+
+/* ==== CONTACTO ==== */
+
+.highlight-text {
+  color: #1a44f7;
+  font-weight: bold;
+}
+
+/* Título principal */
+.section-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1a44f7;
+  margin-bottom: 20px;
+}
+
+/* Tarjeta de información */
+.contact-card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  height: 100%;
+  background-color: #fff;
+  transition: transform 0.2s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-5px);
+}
+
+.contact-card p {
+  margin-bottom: 10px;
+}
+
+/* Íconos */
+.contact-icon {
+  font-size: 1.3rem;
+  color: #1a44f7;
+  margin-right: 10px;
+}
+
+/* Redes sociales */
+.social-links a {
+  text-decoration: none;
+  color: #1a44f7;
+  margin: 0 10px;
+  font-size: 1.7rem;
+  transition: color 0.2s ease;
+}
+
+.social-links a:hover {
+  color: #000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.6rem;
+  }
+
+  .contact-card {
+    padding: 20px;
+  }
+}
+
+/* ==== HACER PEDIDO ==== */
+
+body {
+  background-color: #f8f9fa;
+}
+
+.btn-primary {
+  background-color: #1a44f7;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #1639cc;
+}
+
+.card {
+  max-width: 280px;
+  border-radius: 15px;
+  margin: 0 auto;
+}
+
+.card-body {
+  padding: 12px;
+}
+
+.card-img-top {
+  max-width: 200px;
+  margin: 0 auto;
+  display: block;
+}
+/* Títulos de los productos en las tarjetas */
+.card-title {
+  color: #000;       /* Negro */
+  /* font-weight: bold;  /* Mantener negrita */
+  font-size: 1.1rem; /* Ajusta tamaño si quieres */
+  text-align: center; /* Centrado dentro de la card */
+}
+
+
+/* Descripción del producto */
+.card-text {
+  font-size: 0.9rem;
+  color: #555;           /* Gris suave */
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* Precio del producto */
+.card .fw-bold {
+  font-size: 1.1rem;
+  color: #000;           /* Negro o ajusta si quieres azul */
+  text-align: center;
+  margin-bottom: 10px;
+}
+/* Botón volver al inicio */
+.btn-volver {
+  color: #fff;               /* Texto blanco */
+  border-color: #1a44f7;     /* Borde azul */
+  background-color: #1a44f7; /* Fondo azul */
+  font-weight: bold;
+}
+.btn-volver:hover {
+  background-color: #1639cc; /* Azul más oscuro al pasar el mouse */
+  border-color: #1639cc;
+  color: #fff;
+}
+

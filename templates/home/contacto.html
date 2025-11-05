@@ -1,0 +1,37 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="container my-5">
+    <h2 class="section-title text-center mb-5">Contáctanos</h2>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="contact-card text-center text-md-start p-4 shadow-sm rounded">
+                <!-- Información general -->
+                <h4 class="highlight-text mb-3 text-center text-md-start">Información general</h4>
+                <p><i class="bi bi-geo-alt contact-icon"></i> <strong>Dirección:</strong> Carmen 1247, Vallenar, Atacama, Chile</p>
+                <p><i class="bi bi-telephone contact-icon"></i> <strong>Teléfonos:</strong> +56 9 8264 6824 / +56 9 5698 7966 / +56 51 2612529</p>
+                <p><i class="bi bi-envelope contact-icon"></i> <strong>Email:</strong> aguapurificadapaitanas@gmail.com</p>
+                <p><i class="bi bi-clock contact-icon"></i> <strong>Horario:</strong> Lunes a Viernes de 9:00 a 18:00 hrs<br> Sábado de 9:00 a 13:00 hrs</p>
+
+                <hr>
+
+                <!-- Redes sociales -->
+                <h5 class="highlight-text mt-4 text-center text-md-start">Síguenos en redes sociales</h5>
+                <div class="social-links mt-3 text-center text-md-start">
+                    <a href="https://web.facebook.com/p/Aguas-Filtradas-Paitan%C3%A1s-61567994830670/?_rdc=1&_rdr#" target="_blank" class="me-3">
+                        <i class="bi bi-facebook fs-4"></i>
+                    </a>
+                    <a href="https://www.instagram.com/aguapaitanas/?igsh=M3NvaDRqMDFpNXlx&utm_source=qr#" target="_blank" class="me-3">
+                        <i class="bi bi-instagram fs-4"></i>
+                    </a>
+                    <a href="https://wa.me/56982646824" target="_blank">
+                        <i class="bi bi-whatsapp fs-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

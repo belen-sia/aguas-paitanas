@@ -1,0 +1,114 @@
+{% extends 'includes/base_portales.html' %}
+{% load static humanize %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4 fw-bold">Detalle del Pedido {{ pedido.id }}</h2>
+
+    <div class="card shadow p-4 mb-4">
+        <h5 class="fw-bold mb-3">Información del Pedido</h5>
+
+        <p>
+            <strong>Cliente:</strong>
+            {% if pedido.cliente %}
+                {{ pedido.cliente.nombre }} {{ pedido.cliente.apellido }}<br>
+                <strong>Dirección:</strong> {{ pedido.cliente.direccion }}<br>
+                <strong>Tipo de Cliente:</strong> {{ pedido.cliente.get_tipo_cliente_display }}<br>
+            {% else %}
+                {{ pedido.nombre_cliente_temp }} {{ pedido.apellido_cliente_temp }}<br>
+                <strong>Dirección:</strong> {{ pedido.direccion_temp }}<br>
+                <strong>Tipo de Cliente:</strong>
+                {% if pedido.tipo_cliente == 'DOMICILIARIO' or pedido.tipo_cliente == 'D' %}
+                    Domiciliario
+                {% elif pedido.tipo_cliente == 'EMPRESA' or pedido.tipo_cliente == 'E' %}
+                    Empresa
+                {% else %}
+                    {{ pedido.tipo_cliente }}
+                {% endif %}
+                <br>
+            {% endif %}
+        </p>
+
+        <p>
+            <strong>Repartidor:</strong>
+            {% if pedido.repartidor %}
+                {{ pedido.repartidor.nombre }}
+            {% else %}
+                -
+            {% endif %}<br>
+
+            <strong>Fecha Pedido:</strong> {{ pedido.fecha_pedido }}<br>
+            <strong>Fecha Entrega:</strong>
+            {% if pedido.fecha_entrega %}
+                {{ pedido.fecha_entrega }}
+            {% else %}
+                -
+            {% endif %}<br>
+
+            <strong>Estado:</strong> {{ pedido.get_estado_display }}<br>
+        </p>
+
+        <p>
+            <strong>Tipo de Factura:</strong>
+            {% if pedido.facturaciones.exists %}
+                {{ pedido.facturaciones.first.tipo_documento }}
+            {% else %}
+                -
+            {% endif %}<br>
+
+            <strong>Monto Total:</strong>
+            {% if pedido.pagos.exists %}
+                ${{ pedido.pagos.first.monto|floatformat:2|intcomma }}
+            {% else %}
+                ${{ pedido.monto_total|floatformat:2|intcomma }}
+            {% endif %}<br>
+
+            <strong>Método de Pago:</strong>
+            {% if pedido.pagos.exists and pedido.pagos.first.metodo_pago %}
+                {{ pedido.pagos.first.metodo_pago.tipo_pago }}
+            {% else %}
+                -
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="card shadow p-4">
+        <h5 class="fw-bold mb-3">Detalles del Pedido</h5>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-secondary text-center">
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario (CLP)</th>
+                        <th>Subtotal (CLP)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in detalles %}
+                        <tr>
+                            <td>{{ detalle.producto.nombre }}</td>
+                            <td class="text-center">{{ detalle.cantidad }}</td>
+                            <td class="text-end">${{ detalle.precio_unitario|floatformat:2|intcomma }}</td>
+                            <td class="text-end">${{ detalle.subtotal|floatformat:2|intcomma }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No hay productos en este pedido.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if request.session.rol == 'ADMIN' or user.is_staff or user.is_superuser %}
+    <div class="text-center mt-4">
+        <a href="{% url 'pedidos:gestion_pedidos' %}" class="btn btn-secondary px-4">
+            ← Volver a Gestión de Pedidos
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

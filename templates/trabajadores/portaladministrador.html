@@ -1,0 +1,89 @@
+{% extends 'includes/base_portales.html' %}
+
+{% block title %}Portal Administrador - Aguas Paitanás{% endblock %}
+{% block usuario_tipo %}Administrador{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-center mb-5 fw-bold">Panel de Gestión - Administrador</h2>
+
+  <div class="row justify-content-center g-4">
+    <!-- Gestión de Usuarios -->
+    <div class="col-12 col-sm-6 col-lg-4">
+      <div class="card h-100 text-center shadow-sm border-0 p-4">
+        <div class="card-body">
+          <h4 class="card-title fw-bold mb-3">Gestión de Usuarios</h4>
+          <p class="card-text mb-4">Agregar, actualizar y eliminar trabajadores del sistema.</p>
+          <a href="{% url 'usuarios:gestion_usuarios' %}" class="btn btn-primary w-100">Ir a Gestión</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gestión de Productos y Mermas -->
+    <div class="col-12 col-sm-6 col-lg-4">
+      <div class="card h-100 text-center shadow-sm border-0 p-4">
+        <div class="card-body">
+          <h4 class="card-title fw-bold mb-3">Gestión de Productos y Mermas</h4>
+          <p class="card-text mb-4">Controlar inventario, registrar mermas y actualizar stock.</p>
+          <a href="{% url 'productos:gestion_productos' %}" class="btn btn-success w-100">Ir a Gestión</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gestión de Pedidos -->
+    <div class="col-12 col-sm-6 col-lg-4">
+      <div class="card h-100 text-center shadow-sm border-0 p-4">
+        <div class="card-body">
+          <h4 class="card-title fw-bold mb-3">Gestión de Pedidos</h4>
+          <p class="card-text mb-4">Consultar, actualizar y administrar pedidos de clientes.</p>
+          <a href="{% url 'pedidos:gestion_pedidos' %}" class="btn btn-warning w-100">Ir a Gestión</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gestión de Clientes -->
+    <div class="col-12 col-sm-6 col-lg-4">
+      <div class="card h-100 text-center shadow-sm border-0 p-4">
+        <div class="card-body">
+          <h4 class="card-title fw-bold mb-3">Gestión de Clientes</h4>
+          <p class="card-text mb-4">Registrar, editar y eliminar información de los clientes.</p>
+          <a href="{% url 'clientes:gestion_clientes' %}" class="btn btn-info w-100 text-white">Ir a Gestión</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reportes -->
+    <div class="col-12 col-sm-6 col-lg-4">
+      <div class="card h-100 text-center shadow-sm border-0 p-4">
+        <div class="card-body">
+          <h4 class="card-title fw-bold mb-3">Reportes</h4>
+          <p class="card-text mb-4">Visualiza reportes de ventas, mermas y desempeño.</p>
+          <a href="{% url 'trabajadores:reportes' %}" class="btn btn-secondary w-100">Ver Reportes</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 1rem;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    color: #0077b6;
+  }
+
+  .btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+  }
+</style>
+{% endblock %}
+

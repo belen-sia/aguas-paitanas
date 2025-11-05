@@ -1,0 +1,230 @@
+{% extends 'includes/base_portales.html' %}
+{% load static humanize %}
+
+{% block title %}Dashboard - Reportes e Indicadores{% endblock %}
+{% block usuario_tipo %}Administrador{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-center fw-bold mb-5 text-primary">Panel de Indicadores de Gestión</h2>
+
+  <!-- Filtros por fecha -->
+  <form method="get" class="row g-2 mb-4">
+    <div class="col-auto">
+      <label for="desde" class="form-label mb-0">Desde</label>
+      <input type="date" id="desde" name="desde" class="form-control" value="{{ request.GET.desde }}">
+    </div>
+    <div class="col-auto">
+      <label for="hasta" class="form-label mb-0">Hasta</label>
+      <input type="date" id="hasta" name="hasta" class="form-control" value="{{ request.GET.hasta }}">
+    </div>
+    <div class="col-auto d-flex align-items-end">
+      <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+    <div class="col-auto d-flex align-items-end">
+      <a href="{% url 'trabajadores:reportes' %}" class="btn btn-outline-secondary">Limpiar</a>
+    </div>
+  </form>
+
+  <!-- Tarjetas de resumen -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-3 col-sm-6">
+      <div class="card bg-primary text-white shadow-sm border-0 p-3">
+        <h5>Promedio de Tiempo de Entrega</h5>
+        <p class="fs-4 fw-bold">
+          {% if promedio_tiempo_entrega %}
+            {{ promedio_tiempo_entrega.days|default:0 }} días
+          {% else %}
+            0 días
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="card bg-success text-white shadow-sm border-0 p-3">
+        <h5>Tasa de Repetición de Clientes Registrados</h5>
+        <p class="fs-4 fw-bold">{{ tasa_repeticion|floatformat:2|default:0 }}%</p>
+      </div>
+    </div>
+
+    <!-- Ventas Clientes Domiciliarios y Empresa -->
+    <div class="col-md-3 col-sm-6">
+      <div class="card bg-warning text-white shadow-sm border-0 p-3">
+        <h5>Ventas Clientes Domiciliarios</h5>
+        <p class="fs-4 fw-bold">${{ ventas_domiciliario_total|floatformat:0|intcomma }}</p>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card bg-info text-white shadow-sm border-0 p-3">
+        <h5>Ventas Clientes Empresa</h5>
+        <p class="fs-4 fw-bold">${{ ventas_empresa_total|floatformat:0|intcomma }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="row g-4 mb-4 align-items-stretch">
+    <div class="col-lg-6 d-flex">
+      <div class="card shadow-sm border-0 w-100 h-100">
+        <div class="card-header bg-light fw-bold">Pedidos por Repartidor</div>
+        <div class="card-body d-flex">
+          <div class="w-100" style="height: 240px;"><canvas id="pedidosRepartidorChart" style="height: 100%; width: 100%;"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 d-flex">
+      <div class="card shadow-sm border-0 w-100 h-100">
+        <div class="card-header bg-light fw-bold">Ventas por Tipo de Cliente</div>
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex gap-3 justify-content-center mb-2">
+            <span class="d-inline-flex align-items-center gap-2">
+              <span style="display:inline-block;width:12px;height:12px;background:#FFC107;border-radius:3px;"></span>
+              <span class="small">Domiciliario</span>
+            </span>
+            <span class="d-inline-flex align-items-center gap-2">
+              <span style="display:inline-block;width:12px;height:12px;background:#0DCAF0;border-radius:3px;"></span>
+              <span class="small">Empresa</span>
+            </span>
+          </div>
+          <div class="flex-grow-1 w-100" style="height: 240px;"><canvas id="ventasTipoChart" style="height: 100%; width: 100%;"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-light fw-bold">Crecimiento Mensual de Ventas</div>
+        <div class="card-body">
+          <div style="height: 340px;">
+            <canvas id="ventasMensualesChart" style="height: 100%;"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Datos JSON para gráficos -->
+{{ ppr_labels|json_script:"ppr-labels" }}
+{{ ppr_values|json_script:"ppr-values" }}
+{{ vm_labels|json_script:"vm-labels" }}
+{{ vm_values|json_script:"vm-values" }}
+{{ ventas_domiciliario_total|json_script:"ventas-domi" }}
+{{ ventas_empresa_total|json_script:"ventas-emp" }}
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script>
+  // Parseo seguro de datos desde JSON embebido
+  const pprLabels = JSON.parse(document.getElementById('ppr-labels').textContent);
+  const pprValues = JSON.parse(document.getElementById('ppr-values').textContent);
+  const vmLabels = JSON.parse(document.getElementById('vm-labels').textContent);
+  const vmValues = JSON.parse(document.getElementById('vm-values').textContent);
+
+  // === Pedidos por Repartidor ===
+  const ctxPedidos = document.getElementById('pedidosRepartidorChart').getContext('2d');
+  new Chart(ctxPedidos, {
+    type: 'bar',
+    data: {
+      labels: pprLabels,
+      datasets: [{
+        label: 'Total Pedidos',
+        data: pprValues,
+        backgroundColor: '#0077b6'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // === Crecimiento Mensual ===
+  const ctxMensual = document.getElementById('ventasMensualesChart').getContext('2d');
+  new Chart(ctxMensual, {
+    type: 'line',
+    data: {
+      labels: vmLabels,
+      datasets: [{
+        label: 'Ventas',
+        data: vmValues,
+        borderColor: '#00b4d8',
+        backgroundColor: 'rgba(0,180,216,0.2)',
+        fill: true,
+        tension: 0.25
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { ticks: { autoSkip: true, maxTicksLimit: 12 } } }
+    }
+  });
+
+  // === Ventas por Tipo de Cliente (porcentaje y montos) ===
+  const ctxTipo = document.getElementById('ventasTipoChart').getContext('2d');
+  const etiquetasTipo = ['Domiciliario','Empresa'];
+  const ventasDomi = JSON.parse(document.getElementById('ventas-domi').textContent);
+  const ventasEmp = JSON.parse(document.getElementById('ventas-emp').textContent);
+  const datosTipo = [Number(ventasDomi) || 0, Number(ventasEmp) || 0];
+  const totalTipo = datosTipo.reduce((a,b)=> Number(a) + Number(b), 0);
+  const coloresTipo = ['#FFC107', '#0DCAF0'];
+  new Chart(ctxTipo, {
+    type: 'doughnut',
+    data: {
+      labels: etiquetasTipo,
+      datasets: [{
+        data: datosTipo,
+        backgroundColor: coloresTipo
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          color: '#333',
+          formatter: (value) => {
+            const v = Number(value) || 0;
+            const t = Number(totalTipo) || 0;
+            const pct = t ? (v / t) * 100 : 0;
+            const monto = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
+            return `${pct.toFixed(1)}%\n${monto}`;
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const label = context.label || '';
+              const val = Number(context.parsed) || 0;
+              const t = Number(totalTipo) || 0;
+              const pct = t ? (val / t) * 100 : 0;
+              const monto = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(val);
+              return `${label}: ${monto} (${pct.toFixed(1)}%)`;
+            }
+          }
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+</script>
+
+<style>
+  h2 { color: #0077b6; }
+  .card { border-radius: 1rem; transition: transform 0.2s; }
+  .card:hover { transform: translateY(-5px); }
+  /* Asegurar que ambas tarjetas de la fila superior siempre igualen alturas */
+  @media (min-width: 992px) {
+    .row.align-items-stretch > [class*='col-'] .card { height: 100%; }
+  }
+</style>
+{% endblock %}

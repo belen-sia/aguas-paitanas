@@ -1,0 +1,61 @@
+{% extends 'includes/base_portales.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4 fw-bold">Crear Nuevo Producto</h2>
+
+    <!-- Botón Volver -->
+    <div class="mb-3">
+        <a href="{% url 'productos:gestion_productos' %}" class="btn btn-secondary">
+            ← Volver a Gestión de Productos
+        </a>
+    </div>
+
+    <!-- Mensajes -->
+    {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" class="shadow rounded-3 p-3">
+        {% csrf_token %}
+        <div class="mb-2">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" name="nombre" class="form-control" required>
+        </div>
+        <div class="mb-2">
+            <label for="categoria" class="form-label">Categoría</label>
+            <select name="categoria" class="form-select" required>
+                <option value="">Seleccione categoría</option>
+                {% for value, label in categorias %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-2">
+            <label for="volumen" class="form-label">Volumen</label>
+            <select name="volumen" class="form-select" required>
+                <option value="">Seleccione volumen</option>
+                {% for value, label in volumenes %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-2">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea name="descripcion" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="mb-2">
+            <label for="precio" class="form-label">Precio (CLP)</label>
+            <input type="number" name="precio" min="0" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Crear Producto</button>
+    </form>
+</div>
+{% endblock %}

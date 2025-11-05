@@ -1,0 +1,75 @@
+{% extends 'includes/base_portales.html' %}
+{% load static humanize %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4 fw-bold">Gestión de Productos</h2>
+
+    <!-- Botones y búsqueda -->
+    <div class="mb-3 d-flex justify-content-between flex-wrap align-items-center">
+        {% if request.session.rol == 'ADMIN' or user.is_staff or user.is_superuser %}
+        <a href="{% url 'trabajadores:portaladministrador' %}" class="btn btn-secondary mb-2">
+            ← Volver al portal administrador
+        </a>
+        {% endif %}
+
+        <form method="get" class="d-flex mb-2 flex-grow-1 mx-2">
+            <input type="text" name="q" class="form-control me-2" placeholder="Buscar producto..." value="{{ request.GET.q }}">
+            <button type="submit" class="btn btn-outline-primary">Buscar</button>
+        </form>
+
+        <a href="{% url 'productos:crear_producto' %}" class="btn btn-primary mb-2">
+            <i class="bi bi-plus-lg"></i> Nuevo Producto
+        </a>
+    </div>
+
+
+    <!-- Tabla de productos -->
+    <div class="table-responsive shadow rounded-3">
+        <table class="table table-hover align-middle text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Volumen</th>
+                    <th>Precio (CLP)</th>
+                    <th>Stock total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td class="fw-semibold">{{ producto.nombre }}</td>
+                    <td>{{ producto.get_categoria_display }}</td>
+                    <td>{{ producto.get_volumen_display }}</td>
+                    <td>${{ producto.precio|intcomma }}</td>
+                    <td>{{ producto.stock }}</td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{% url 'stock:actualizar_stock_form' producto.id %}" class="btn btn-success btn-sm">
+                                <i class="bi bi-arrow-repeat"></i> Stock
+                            </a>
+                            <a href="{% url 'mermas:registrar_merma' producto.id %}" class="btn btn-danger btn-sm">
+                                <i class="bi bi-exclamation-circle"></i> Merma
+                            </a>
+                            <form method="post" action="{% url 'productos:eliminar_producto' producto.id %}" onsubmit="return confirm('¿Seguro que deseas eliminar este producto?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-3">No hay productos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

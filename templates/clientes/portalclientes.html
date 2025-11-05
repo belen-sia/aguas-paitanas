@@ -1,0 +1,31 @@
+{% extends "includes/base_portales.html" %}
+{% load static %}
+
+{% block title %}Portal Cliente - Aguas Paitanás{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex flex-column align-items-center justify-content-center min-vh-100 py-5">
+
+    <!-- Tarjeta central -->
+    <div class="card p-5 rounded-4 shadow-lg text-center" style="max-width: 600px; width: 100%; background-color: #ffffff;">
+      <div class="text-center mb-4">
+        <img src="{% static 'assets/logohorizontal.png' %}" alt="Aguas Paitanás" class="img-fluid" style="max-width: 250px;">
+      </div>
+
+      <h3 class="mb-3 text-primary fw-semibold">Bienvenido(a), {{ cliente.nombre }} {{ cliente.apellido }}</h3>
+      <p class="mb-4 text-secondary">Selecciona una opción para continuar:</p>
+
+      <div class="d-flex flex-column align-items-center gap-3">
+        <a href="{% url 'clientes:editar_perfil' %}" class="btn btn-outline-primary w-75 py-2">
+          <i class="bi bi-person-circle me-2"></i> Editar Datos de Registro
+        </a>
+
+        <a href="{% url 'clientes:carrito' %}" class="btn btn-success w-75 py-2 fw-semibold">
+          <i class="bi bi-cart-check me-2"></i> Realizar Compras / Pedidos
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

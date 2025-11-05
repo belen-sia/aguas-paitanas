@@ -1,0 +1,42 @@
+{% extends 'includes/base_login.html' %}
+
+{% block title %}Iniciar Sesión - Aguas Paitanás{% endblock %}
+{% block body_class %}login-page{% endblock %}
+
+{% block content %}
+<h3 class="text-center mb-4 text-primary">Iniciar Sesión</h3>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-warning">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+{% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for err in form.non_field_errors %}{{ err }}<br>{% endfor %}
+  </div>
+{% endif %}
+
+<form method="POST" novalidate>
+  {% csrf_token %}
+  <div class="mb-3">
+      <label for="correo" class="form-label">Correo Electrónico</label>
+      <input type="email" class="form-control input-rounded" id="correo" name="correo" placeholder="ejemplo@correo.com" value="{{ form.data.correo|default_if_none:'' }}" required>
+      {% if form.errors.correo %}
+        <div class="text-danger small">{% for err in form.errors.correo %}{{ err }}{% endfor %}</div>
+      {% endif %}
+  </div>
+  <div class="mb-3">
+      <label for="contrasena" class="form-label">Contraseña</label>
+      <input type="password" class="form-control input-rounded" id="contrasena" name="contrasena" placeholder="Ingresa tu contraseña" minlength="4" maxlength="6" pattern=".{4,6}" required>
+      {% if form.errors.contrasena %}
+        <div class="text-danger small">{% for err in form.errors.contrasena %}{{ err }}{% endfor %}</div>
+      {% endif %}
+  </div>
+
+  <button type="submit" class="btn btn-custom w-100 mb-3">Iniciar sesión</button>
+  <a href="{% url 'home:inicioindex' %}" class="btn btn-custom-outline w-100 mb-3">Volver al inicio</a>
+  <p class="text-center mt-2">¿No tienes cuenta? <a href="{% url 'home:registrar' %}">Regístrate</a></p>
+</form>
+{% endblock %}

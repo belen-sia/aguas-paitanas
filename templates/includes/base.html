@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Aguas Paitanás{% endblock %}</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <!-- CSS global -->
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- ======= NAVBAR ======= -->
+  {% block navbar %}
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'home:inicioindex' %}">
+        <img src="{% static 'assets/logohorizontal.png' %}" alt="Aguas Paitanás" height="50">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="{% url 'home:inicioindex' %}">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'home:registrar' %}">Regístrate</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'usuarios:iniciarsesion' %}">Iniciar sesión</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'home:contacto' %}">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  {% endblock %}
+
+  <!-- ======= CONTENIDO PRINCIPAL ======= -->
+  <main>
+    {% block content %}
+    <!-- Aquí va el contenido de cada página -->
+    {% endblock %}
+  </main>
+
+  <!-- ======= FOOTER ======= -->
+  {% block footer %}
+  <footer class="bg-light text-center py-4 mt-5">
+    <p class="mb-0 text-muted">&copy; 2025 Aguas Paitanás. Todos los derechos reservados.</p>
+  </footer>
+  {% endblock %}
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,64 @@
+{% extends 'includes/base_portales.html' %}
+{% block title %}Pedidos Asignados - Repartidor{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2 class="mb-4">Pedidos Asignados</h2>
+
+  {% if pedidos %}
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Dirección</th>
+          <th>Teléfono</th>
+          <th>Fecha pedido</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pedidos %}
+        <tr>
+          <td>#{{ p.id }}</td>
+          <td>
+            {% if p.cliente %}
+              {{ p.cliente.nombre }} {{ p.cliente.apellido }}
+            {% else %}
+              {{ p.nombre_cliente_temp }} {{ p.apellido_cliente_temp }}
+            {% endif %}
+          </td>
+          <td>{% if p.cliente %}{{ p.cliente.direccion }}{% else %}{{ p.direccion_temp }}{% endif %}</td>
+          <td>{% if p.cliente %}{{ p.cliente.telefono }}{% else %}{{ p.telefono_temp }}{% endif %}</td>
+          <td>{{ p.fecha_pedido|date:"d/m/Y" }}</td>
+          <td>
+            <span class="badge {% if p.estado == 'ENTREGADO' %}bg-success{% elif p.estado == 'EN_PROCESO' %}bg-warning text-dark{% elif p.estado == 'PENDIENTE' %}bg-secondary{% else %}bg-light text-dark{% endif %}">
+              {{ p.get_estado_display }}
+            </span>
+          </td>
+          <td>
+            <div class="d-flex flex-wrap gap-2">
+              <form action="{% url 'repartidores:actualizar_pedido_repartidor' p.id %}" method="post" class="d-flex gap-2">
+                {% csrf_token %}
+                <select name="estado" class="form-select form-select-sm" style="max-width: 180px;">
+                  {% for val,label in ESTADOS %}
+                    <option value="{{ val }}" {% if p.estado == val %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
+              </form>
+              <a href="{% url 'pedidos:detalle_pedido' p.id %}" class="btn btn-sm btn-info">Ver</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="alert alert-info">No tienes pedidos asignados actualmente.</div>
+  {% endif %}
+</div>
+{% endblock %}

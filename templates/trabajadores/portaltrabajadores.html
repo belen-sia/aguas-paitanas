@@ -1,0 +1,63 @@
+{% extends 'includes/base_portales.html' %}
+
+{% block title %}Portal Trabajador - Aguas Paitanás{% endblock %}
+{% block usuario_tipo %}Trabajador{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-center mb-5 fw-bold">Panel de Gestión - Trabajador</h2>
+
+  <div class="row justify-content-center g-4">
+    <!-- Gestión de Productos y Mermas -->
+    <div class="col-12 col-sm-6 col-lg-5">
+      <div class="card h-100 text-center shadow-sm border-0 p-4">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h4 class="card-title fw-bold mb-3">Gestión de Productos y Mermas</h4>
+            <p class="card-text mb-4">Registrar, actualizar y controlar inventario y mermas.</p>
+          </div>
+          <a href="{% url 'productos:gestion_productos' %}" class="btn btn-success w-100 mt-auto">
+            Ir a Gestión
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gestión de Pedidos -->
+    <div class="col-12 col-sm-6 col-lg-5">
+      <div class="card h-100 text-center shadow-sm border-0 p-4">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h4 class="card-title fw-bold mb-3">Gestión de Pedidos</h4>
+            <p class="card-text mb-4">Registrar, revisar y despachar pedidos de clientes.</p>
+          </div>
+          <a href="{% url 'pedidos:gestion_pedidos' %}" class="btn btn-warning w-100 mt-auto">
+            Ir a Gestión
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 1rem;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    color: #0077b6;
+  }
+
+  .btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,109 @@
+{{% extends 'includes/base_portales.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- FORMULARIO DE REGISTRO -->
+    <div class="card shadow-lg rounded-4 mx-auto mb-5" style="max-width: 600px;">
+        <div class="card-header bg-danger text-white text-center py-3 rounded-top-4">
+            <h3 class="fw-bold mb-0">Registrar Merma</h3>
+            <p class="mb-0 fs-6">Producto: <strong>{{ producto.nombre }}</strong></p>
+        </div>
+
+        <div class="card-body bg-light p-4">
+            <form method="post" action="{% url 'mermas:registrar_merma' producto.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="producto_id" value="{{ producto.id }}">
+
+                <!-- Cantidad -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Cantidad</label>
+                    <input type="number" name="cantidad" min="1" class="form-control" placeholder="Ingrese cantidad de merma" required>
+                </div>
+
+                <!-- Motivo -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Motivo</label>
+                    <input type="text" name="motivo" maxlength="100" class="form-control" placeholder="Ejemplo: producto dañado, vencido..." required>
+                </div>
+
+                <!-- Costo -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Costo (CLP)</label>
+                    <input type="number" name="costo" step="0.01" min="0" class="form-control" placeholder="Ingrese costo asociado" required>
+                </div>
+
+                <!-- Sucursal -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Sucursal</label>
+                    <select name="sucursal_id" class="form-select" required>
+                        <option value="">Seleccione una sucursal</option>
+                        {% for sucursal in sucursales %}
+                            <option value="{{ sucursal.id }}">{{ sucursal.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Fecha -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Fecha</label>
+                    <input type="date" name="fecha" class="form-control" value="{{ today }}">
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{% url 'productos:gestion_productos' %}" class="btn btn-secondary">
+                        ← Volver
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-check-circle"></i> Registrar Merma
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- HISTORIAL DE MERMAS -->
+    <div class="card shadow rounded-4 mb-5">
+        <div class="card-header bg-secondary text-white text-center py-3 rounded-top-4">
+            <h4 class="fw-bold mb-0">Historial de Mermas</h4>
+            <p class="mb-0 fs-6">Registro histórico del producto: <strong>{{ producto.nombre }}</strong></p>
+        </div>
+        <div class="card-body p-4 bg-light">
+            {% if historial_mermas %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center">
+                        <thead class="table-danger">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cantidad</th>
+                                <th>Motivo</th>
+                                <th>Costo (CLP)</th>
+                                <th>Sucursal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for merma in historial_mermas %}
+                                <tr>
+                                    <td>{{ merma.fecha|date:"d/m/Y" }}</td>
+                                    <td>{{ merma.cantidad }}</td>
+                                    <td>{{ merma.motivo }}</td>
+                                    <td>${{ merma.costo|floatformat:0|intcomma }}</td>
+                                    <td>{{ merma.sucursal.nombre }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center text-muted">
+                    <p class="mb-0">No existen mermas registradas para este producto.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
