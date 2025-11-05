@@ -3,7 +3,9 @@ import os
 import dj_database_url
 from decouple import config
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
+# 📁 Directorio base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # 🚫 Seguridad
@@ -12,13 +14,16 @@ ALLOWED_HOSTS = ['aguas-paitanas.onrender.com', 'localhost', '127.0.0.1']
 
 # 📦 Archivos estáticos
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Carpeta donde collectstatic guardará todo
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Carpeta donde tienes tus archivos estáticos
 
 # Whitenoise para servir archivos estáticos en producción
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
-# 📧 Configuración de correo (usa las mismas que local o variables de entorno)
+# Usa almacenamiento comprimido y con hash para mejorar el rendimiento
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# 📧 Configuración de correo
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
@@ -29,10 +34,11 @@ EMAIL_TIMEOUT = 30
 DEFAULT_FROM_EMAIL = "Aguas Paitanás <aguapurificadapaitanas@gmail.com>"
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
-# 🗃️ Base de datos — Railway crea DATABASE_URL automáticamente
+# 🗃️ Base de datos — Render/Railway crean DATABASE_URL automáticamente
 DATABASES = {
     'default': dj_database_url.config(
-        default=config('DATABASE_URL', default='sqlite:///db.sqlite3')
+        default=config('DATABASE_URL', default='sqlite:///db.sqlite3'),
+        conn_max_age=600
     )
 }
 
@@ -40,7 +46,7 @@ DATABASES = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# 🧩 Configuración de usuarios personalizada (igual que en local)
+# 🧩 Configuración de usuarios personalizada
 AUTH_USER_MODEL = 'Usuarios.Usuario'
 LOGIN_REDIRECT_URL = 'redirigir_por_rol'
 LOGOUT_REDIRECT_URL = 'iniciarsesion'
@@ -52,12 +58,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-from django.contrib.messages import constants as messages
+# 💬 Estilos de mensajes
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
     messages.SUCCESS: 'success',
     messages.INFO: 'info',
     messages.WARNING: 'warning',
 }
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
