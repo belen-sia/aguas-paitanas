@@ -5,7 +5,7 @@ from decouple import config
 
 # 🚫 Seguridad
 DEBUG = False
-ALLOWED_HOSTS = ['*']  # luego puedes cambiarlo por tu dominio o URL Railway
+ALLOWED_HOSTS = ['aguas-paitanas.onrender.com', 'localhost', '127.0.0.1']
 
 # 📦 Archivos estáticos
 STATIC_URL = '/static/'
