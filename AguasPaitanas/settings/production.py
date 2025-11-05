@@ -3,9 +3,7 @@ import os
 import dj_database_url
 from decouple import config
 from pathlib import Path
-from django.contrib.messages import constants as messages
 
-# 📁 Directorio base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # 🚫 Seguridad
@@ -14,37 +12,17 @@ ALLOWED_HOSTS = ['aguas-paitanas.onrender.com', 'localhost', '127.0.0.1']
 
 # 📦 Archivos estáticos
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Carpeta donde collectstatic guardará todo
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Carpeta donde tienes tus archivos estáticos
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # ← ESTA ES LA CLAVE
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Whitenoise para servir archivos estáticos en producción
+# Middleware de WhiteNoise
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
-# Usa almacenamiento comprimido y con hash para mejorar el rendimiento
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# 📧 Configuración de correo
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='aguapurificadapaitanas@gmail.com')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='mgqzvbzcananyecg')
-EMAIL_TIMEOUT = 30
-DEFAULT_FROM_EMAIL = "Aguas Paitanás <aguapurificadapaitanas@gmail.com>"
-SERVER_EMAIL = DEFAULT_FROM_EMAIL
-
-# 🗃️ Base de datos — Render/Railway crean DATABASE_URL automáticamente
-DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL', default='sqlite:///db.sqlite3'),
-        conn_max_age=600
-    )
-}
 
 # 📁 Archivos multimedia
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # 🧩 Configuración de usuarios personalizada
 AUTH_USER_MODEL = 'Usuarios.Usuario'
@@ -58,7 +36,26 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-# 💬 Estilos de mensajes
+# 📧 Configuración de correo
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='aguapurificadapaitanas@gmail.com')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='mgqzvbzcananyecg')
+EMAIL_TIMEOUT = 30
+DEFAULT_FROM_EMAIL = "Aguas Paitanás <aguapurificadapaitanas@gmail.com>"
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# 🗃️ Base de datos
+DATABASES = {
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL', default='sqlite:///db.sqlite3')
+    )
+}
+
+# 📢 Mensajes
+from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
     messages.SUCCESS: 'success',
